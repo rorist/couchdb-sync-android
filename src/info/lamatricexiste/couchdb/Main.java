@@ -8,12 +8,34 @@ import com.couchbase.libcouch.CouchDB;
 import com.couchbase.libcouch.ICouchClient;
 
 public class Main extends Activity {
+
+    private ServiceConnection couchServiceConnection;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        String release = "release-0.1";
-        CouchDB.getService(getBaseContext(), null, release, mCallback);
+        startCouch();
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        startCouch();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unbindService(couchServiceConnection);
+        }
+        catch (IllegalArgumentException e) {}
+    }
+
+    private void startCouch() {
+        couchServiceConnection = CouchDB.getService(getBaseContext(), null, "release-0.1",
+                mCallback);
     }
 
     private final ICouchClient mCallback = new ICouchClient.Stub() {
