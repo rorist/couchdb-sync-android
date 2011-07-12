@@ -1,5 +1,10 @@
 package info.lamatricexiste.couchdb;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +14,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.couchbase.libcouch.ICouchClient;
 import com.couchbase.libcouch.ICouchService;
@@ -78,7 +82,17 @@ public class Main extends Activity {
 
         @Override
         public void installing(int completed, int total) throws RemoteException {
+            Log.e("INSTALL", completed + " / " + total);
         }
 
     };
+
+    private void sendRequest(String host, int port, JSONObject req) {
+        try {
+            URI requestUri = new URI("http", "", host, port, "Contacts", "", "");
+        }
+        catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 }
