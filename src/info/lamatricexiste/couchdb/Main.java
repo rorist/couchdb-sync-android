@@ -35,7 +35,7 @@ public class Main extends Activity {
     }
 
     private void startCouch() {
-        bindService(new Intent("com.arandomurl.couchapp.ICouchService"), couchServiceConnection,
+        bindService(new Intent("com.couchone.libcouch.ICouchService"), couchServiceConnection,
                 Context.BIND_AUTO_CREATE);
     }
 
