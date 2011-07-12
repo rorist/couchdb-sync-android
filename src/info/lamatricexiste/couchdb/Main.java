@@ -8,9 +8,16 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.couchbase.libcouch.ICouchClient;
+import com.couchbase.libcouch.ICouchService;
+
 public class Main extends Activity {
+
+    private final static String ACTION = "com.couchone.libcouch.ICouchService";
+    ICouchService couchService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,18 +42,25 @@ public class Main extends Activity {
     }
 
     private void startCouch() {
-        bindService(new Intent("com.couchone.libcouch.ICouchService"), couchServiceConnection,
-                Context.BIND_AUTO_CREATE);
+        bindService(new Intent(ACTION), couchServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection couchServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            couchService = ICouchService.Stub.asInterface(service);
+            try {
+                couchService.initCouchDB(couchClient, null, "release-0.1");
+            }
+            catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            couchService = null;
         }
 
     };
@@ -55,7 +69,7 @@ public class Main extends Activity {
 
         @Override
         public void couchStarted(String host, int port) throws RemoteException {
-            Toast.makeText(Main.this, "host=" + host + ", port=" + port, Toast.LENGTH_LONG);
+            Log.e("Main", "host=" + host + ", port=" + port);
         }
 
         @Override

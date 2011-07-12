@@ -1,6 +1,6 @@
-package info.lamatricexiste.couchdb;
+package com.couchbase.libcouch;
 
-import info.lamatricexiste.couchdb.ICouchClient;
+import com.couchbase.libcouch.ICouchClient;
 
 interface ICouchService
 {

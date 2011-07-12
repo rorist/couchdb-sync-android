@@ -1,4 +1,4 @@
-package info.lamatricexiste.couchdb;
+package com.couchbase.libcouch;
 
 interface ICouchClient
 {
