@@ -2,12 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="Hello World, Main"
-    />
+    android:layout_height="fill_parent" >
+    
+    <Button
+        android:id="@+id/btn_rep1"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:text="Replicate server->local" />
+    <Button
+        android:id="@+id/btn_rep2"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:text="Replicate local->server" />
+    
+	<TextView
+	    android:id="@+id/output"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="" />
+	    
 </LinearLayout>
 

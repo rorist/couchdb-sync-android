@@ -7,9 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,6 +16,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import com.couchbase.libcouch.ICouchClient;
 import com.couchbase.libcouch.ICouchService;
@@ -26,13 +26,34 @@ import com.couchbase.libcouch.ICouchService;
 public class Main extends Activity {
 
     private final static String ACTION = "com.couchone.libcouch.ICouchService";
-    ICouchService couchService;
+    private String mHost;
+    private int mPort;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         startCouch();
+
+        // Buttons
+        findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Server -> Local
+                sendRequest(mHost, mPort, "POST", "_replicate", "{\"source\":\""
+                        + getString(R.string.server_master)
+                        + "\",\"target\":\"contacts\",\"create_target\":true}");
+            }
+        });
+        findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Local -> Server
+                sendRequest(mHost, mPort, "POST", "_replicate",
+                        "{\"source\":\"contacts\",\"target\":\""
+                                + getString(R.string.server_master) + "\"}");
+            }
+        });
     }
 
     @Override
@@ -55,6 +76,7 @@ public class Main extends Activity {
     }
 
     private ServiceConnection couchServiceConnection = new ServiceConnection() {
+        private ICouchService couchService;
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -79,20 +101,13 @@ public class Main extends Activity {
         @Override
         public void couchStarted(String host, int port) throws RemoteException {
             Log.e("Main", "host=" + host + ", port=" + port);
-            JSONObject json;
-            try {
-                // Replication test
-                json = new JSONObject("{'source':'" + getString(R.string.server_master)
-                        + "','target':'contacts','create_target':true}");
-                sendRequest(host, port, "POST", "_replicate", json.toString());
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
+            mHost = host;
+            mPort = port;
         }
 
         @Override
         public void exit(String error) throws RemoteException {
+            Log.e("EXIT", error);
         }
 
         @Override
@@ -102,8 +117,14 @@ public class Main extends Activity {
 
     };
 
+    // private void sendRequest(String host, int port, String method, String action) {
+    // sendRequest(host, port, method, action, null);
+    // }
+
     private void sendRequest(String host, int port, String method, String action, String data) {
-        StringBuffer sb = new StringBuffer();
+        // Debug
+        ((TextView) findViewById(R.id.output)).setText("");
+        // StringBuffer sb = new StringBuffer();
         try {
             HttpURLConnection c = (HttpURLConnection) new URL("http://" + host + ":" + port + "/"
                     + action).openConnection();
@@ -123,7 +144,9 @@ public class Main extends Activity {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(c.getInputStream()));
                 String line;
                 while ((line = rd.readLine()) != null) {
-                    sb.append(line);
+                    // Debug
+                    ((TextView) findViewById(R.id.output)).append(line);
+                    // sb.append(line);
                 }
                 rd.close();
             }
