@@ -1,8 +1,16 @@
 package info.lamatricexiste.couchdb;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -74,6 +82,16 @@ public class Main extends Activity {
         @Override
         public void couchStarted(String host, int port) throws RemoteException {
             Log.e("Main", "host=" + host + ", port=" + port);
+            JSONObject json;
+            try {
+                // Replication test
+                json = new JSONObject("{'source':'" + getString(R.string.server_master)
+                        + "','target':'contacts','create_target':true}");
+                byte[] data = sendRequest(host, port, json.toString());
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -87,12 +105,70 @@ public class Main extends Activity {
 
     };
 
-    private void sendRequest(String host, int port, JSONObject req) {
+    private byte[] sendRequest(String host, int port, String req) {
+        HttpEntity entity = null;
+        InputStream is = null;
+        HttpPost method = null;
+        byte[] data = null;
         try {
-            URI requestUri = new URI("http", "", host, port, "Contacts", "", "");
+            DefaultHttpClient client = new DefaultHttpClient();
+            method = new HttpPost(new URI("http", null, host, port, "/_replicate", null, null));
+            method.addHeader("Content-type", "application/json; charset=UTF-8");
+            method.setEntity(new StringEntity(req));
+            HttpResponse response = client.execute(method);
+            entity = response.getEntity();
+            is = entity.getContent();
         }
-        catch (URISyntaxException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
+        finally {
+            if (is != null) {
+                data = readFully(is);
+            }
+            if (method != null) {
+                method.abort();
+            }
+            if (entity != null) {
+                try {
+                    entity.consumeContent();
+                }
+                catch (IOException e) {}
+            }
+            if (is != null) {
+                try {
+                    is.close();
+                }
+                catch (final IOException ignore) {}
+            }
+        }
+        return data;
+    }
+
+    private byte[] readFully(final InputStream is) {
+        ByteArrayOutputStream out = null;
+        final byte[] buffer = new byte[1024];
+        byte[] result;
+        try {
+            out = new ByteArrayOutputStream();
+            int read;
+            while ((read = is.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+            result = out.toByteArray();
+        }
+        catch (final IOException e) {
+            result = new byte[0];
+        }
+        finally {
+            if (out != null) {
+                try {
+                    out.close();
+                }
+                catch (final IOException ignore) {}
+            }
+        }
+        return result;
     }
 }
