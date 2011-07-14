@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.app.Activity;
@@ -12,11 +13,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
@@ -32,6 +35,7 @@ public class Main extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.main);
         startCouch();
 
@@ -40,18 +44,18 @@ public class Main extends Activity {
             @Override
             public void onClick(View v) {
                 // Server -> Local
-                sendRequest(mHost, mPort, "POST", "_replicate", "{\"source\":\""
+                new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
                         + getString(R.string.server_master)
-                        + "\",\"target\":\"contacts\",\"create_target\":true}");
+                        + "\",\"target\":\"contacts\",\"create_target\":true}").execute();
             }
         });
         findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Local -> Server
-                sendRequest(mHost, mPort, "POST", "_replicate",
+                new RequestTask(mHost, mPort, "POST", "_replicate",
                         "{\"source\":\"contacts\",\"target\":\""
-                                + getString(R.string.server_master) + "\"}");
+                                + getString(R.string.server_master) + "\"}").execute();
             }
         });
     }
@@ -117,47 +121,76 @@ public class Main extends Activity {
 
     };
 
-    // private void sendRequest(String host, int port, String method, String action) {
-    // sendRequest(host, port, method, action, null);
-    // }
+    private class RequestTask extends AsyncTask<Void, Void, String> {
 
-    private void sendRequest(String host, int port, String method, String action, String data) {
-        // Debug
-        ((TextView) findViewById(R.id.output)).setText("");
-        // StringBuffer sb = new StringBuffer();
-        try {
-            HttpURLConnection c = (HttpURLConnection) new URL("http://" + host + ":" + port + "/"
-                    + action).openConnection();
-            String charEncoding = "iso-8859-1";
-            c.setDoOutput(true);
-            c.setUseCaches(false);
-            c.setRequestMethod(method);
-            c.setRequestProperty("Content-type", "application/json; charset=UTF-8");
+        private URL url;
+        private String method;
+        private String data;
 
-            if (method != "GET" && data != null) {
-                c.setDoInput(true);
-                c.setRequestProperty("Content-Length", Integer.toString(data.length()));
-                c.getOutputStream().write(data.getBytes(charEncoding));
-            }
-            c.connect();
+        RequestTask(String host, int port, String method, String action, String data) {
+            this.method = method;
+            this.data = data;
             try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    // Debug
-                    ((TextView) findViewById(R.id.output)).append(line);
-                    // sb.append(line);
+                url = new URL("http://" + host + ":" + port + "/" + action);
+            }
+            catch (MalformedURLException e) {}
+        }
+
+        @Override
+        protected void onPreExecute() {
+            setProgressBarIndeterminateVisibility(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            StringBuffer sb = new StringBuffer();
+            try {
+                HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                String charEncoding = "iso-8859-1";
+                c.setDoOutput(true);
+                c.setUseCaches(false);
+                c.setRequestMethod(method);
+                c.setRequestProperty("Content-type", "application/json; charset=UTF-8");
+
+                if (method != "GET" && data != null) {
+                    c.setDoInput(true);
+                    c.setRequestProperty("Content-Length", Integer.toString(data.length()));
+                    c.getOutputStream().write(data.getBytes(charEncoding));
                 }
-                rd.close();
+                c.connect();
+                try {
+                    BufferedReader rd = new BufferedReader(
+                            new InputStreamReader(c.getInputStream()));
+                    String line;
+                    while ((line = rd.readLine()) != null) {
+                        // Debug
+                        sb.append(line);
+                    }
+                    rd.close();
+                }
+                catch (FileNotFoundException e) {}
+                catch (NullPointerException e) {}
+                finally {
+                    c.disconnect();
+                }
             }
-            catch (FileNotFoundException e) {}
-            catch (NullPointerException e) {}
-            finally {
-                c.disconnect();
+            catch (IOException e) {
+                e.printStackTrace();
             }
+            return sb.toString();
         }
-        catch (IOException e) {
-            e.printStackTrace();
+
+        @Override
+        protected void onPostExecute(String result) {
+            setProgressBarIndeterminateVisibility(false);
+            ((TextView) findViewById(R.id.output)).setText(result);
         }
+
+        @Override
+        protected void onCancelled() {
+            setProgressBarIndeterminateVisibility(false);
+            ((TextView) findViewById(R.id.output)).setText("Cancelled");
+        }
+
     }
 }
