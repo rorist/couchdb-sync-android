@@ -46,7 +46,8 @@ public class Main extends Activity {
                 // Server -> Local
                 new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
                         + getString(R.string.server_master)
-                        + "\",\"target\":\"contacts\",\"create_target\":true}").execute();
+                        + "\",\"target\":\"contacts\",\"create_target\":true,\"continuous\":true}")
+                        .execute();
             }
         });
         findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
