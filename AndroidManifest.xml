@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="info.lamatricexiste.couchdb"
+    package="info.lamatricexiste.budiez"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -16,7 +16,7 @@
         </activity>
         
         <activity
-            android:name=".authenticator.AuthenticatorActivity"
+            android:name="info.lamatricexiste.budiez.authenticator.AuthenticatorActivity"
             android:label="Sign-in"
             android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true" />
@@ -34,7 +34,7 @@
         </service>
     
         <service
-            android:name=".syncadapter.SyncService"
+            android:name="info.lamatricexiste.budiez.syncadapter.SyncService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
