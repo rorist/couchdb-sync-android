@@ -4,4 +4,4 @@
     android:accountType="info.lamatricexiste.budiez"
     android:icon="@drawable/icon"
     android:smallIcon="@drawable/icon"
-    android:label="@string/accout_label" />
+    android:label="@string/accout_label" /> 

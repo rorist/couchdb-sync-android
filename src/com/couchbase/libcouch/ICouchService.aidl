@@ -12,5 +12,5 @@ interface ICouchService
     /*
      * 
      */
-    void quitCouchDB();
+    void quitCouchDB(); 
 }
