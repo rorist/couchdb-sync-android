@@ -2,3 +2,4 @@
 # For customization when using a Version Control System, please read the
 # header note.
 sdk.dir=/opt/android-sdk
+sdk-location=/opt/android-sdk
