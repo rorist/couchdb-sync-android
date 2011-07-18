@@ -38,7 +38,8 @@
                 android:scrollHorizontally="true"
                 android:capitalize="none"
                 android:autoText="false"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:text="rorist@gmail.com" />
             <TextView
                 android:id="@+id/username_fixed"
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -64,7 +65,8 @@
                 android:capitalize="none"
                 android:autoText="false"
                 android:password="true"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:text="Password" />
             <TextView
                 android:id="@+id/message_bottom"
                 android:textAppearance="?android:attr/textAppearanceSmall"
