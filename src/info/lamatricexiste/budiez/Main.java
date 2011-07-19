@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.ref.PhantomReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +19,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -33,7 +31,7 @@ import com.couchbase.libcouch.ICouchService;
 public class Main extends Activity {
 
     private final static String ACTION = "com.couchone.libcouch.ICouchService";
-    private static final String TAG = "Main";
+    // private static final String TAG = "Main";
     private String mHost;
     private int mPort;
 
