@@ -165,41 +165,7 @@ public class Main extends Activity {
 
         @Override
         protected String doInBackground(Void... params) {
-            StringBuffer sb = new StringBuffer();
-            try {
-                HttpURLConnection c = (HttpURLConnection) url.openConnection();
-                String charEncoding = "iso-8859-1";
-                c.setDoOutput(true);
-                c.setUseCaches(false);
-                c.setRequestMethod(method);
-                c.setRequestProperty("Content-type", "application/json; charset=UTF-8");
-
-                if (method != "GET" && data != null) {
-                    c.setDoInput(true);
-                    c.setRequestProperty("Content-Length", Integer.toString(data.length()));
-                    c.getOutputStream().write(data.getBytes(charEncoding));
-                }
-                c.connect();
-                try {
-                    BufferedReader rd = new BufferedReader(
-                            new InputStreamReader(c.getInputStream()));
-                    String line;
-                    while ((line = rd.readLine()) != null) {
-                        // Debug
-                        sb.append(line);
-                    }
-                    rd.close();
-                }
-                catch (FileNotFoundException e) {}
-                catch (NullPointerException e) {}
-                finally {
-                    c.disconnect();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return sb.toString();
+            return Network.request(url, method, data);
         }
 
         @Override
