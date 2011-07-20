@@ -8,10 +8,12 @@ import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
@@ -20,6 +22,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_USERNAME = "username";
     private AccountManager mAccountManager;
+    private String mUsername;
+    private String mPassword;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -42,19 +46,53 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     public void handleLogin(View view) {
         Log.e("AuthenticatorActivity", "handlLogin()");
-        final String mUsername = "rorist";
-        final String mPassword = "1be168ff837f043bde17c0314341c84271047b31";
-        final Account account = new Account(mUsername, Constants.ACCOUNT_TYPE);
-        mAccountManager.addAccountExplicitly(account, mPassword, null);
+        mUsername = ((EditText) findViewById(R.id.username_edit)).getText().toString();
+        mPassword = ((EditText) findViewById(R.id.password_edit)).getText().toString();
+        new AuthTask().execute(mUsername, mPassword);
+    }
 
-        final Intent intent = new Intent();
-        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, mUsername);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-        intent.putExtra(AccountManager.KEY_AUTHTOKEN, mPassword);
-        setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
+    private class AuthTask extends AsyncTask<String, Void, String> {
 
-        finish();
+        @Override
+        protected void onPreExecute() {
+            showDialog(0);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            // Send user auth
+            final String user = params[0];
+            final String pass = params[1];
+
+            String token = "";
+            return token;
+        }
+
+        @Override
+        protected void onPostExecute(String token) {
+            // Create account
+            final Account account = new Account(mUsername, Constants.ACCOUNT_TYPE);
+            mAccountManager.addAccountExplicitly(account, mPassword, null);
+
+            // Set result intention
+            final Intent intent = new Intent();
+            intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, mUsername);
+            intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+            intent.putExtra(AccountManager.KEY_AUTHTOKEN, token);
+            setAccountAuthenticatorResult(intent.getExtras());
+            setResult(RESULT_OK, intent);
+
+            // Close Authenticator
+            finish();
+            dismissDialog(0);
+        }
+
+        @Override
+        protected void onCancelled() {
+            dismissDialog(0);
+            // TODO: handle error
+        }
+
     }
 
 }
