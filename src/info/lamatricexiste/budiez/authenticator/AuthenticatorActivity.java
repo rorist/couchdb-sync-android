@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
@@ -53,9 +55,15 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     private class AuthTask extends AsyncTask<String, Void, String> {
 
+        private URL url;
+
         @Override
         protected void onPreExecute() {
             showDialog(0);
+            try {
+                url = new URL(getString(R.string.server_master));
+            }
+            catch (MalformedURLException e) {}
         }
 
         @Override
