@@ -1,10 +1,5 @@
 package info.lamatricexiste.budiez;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -30,8 +25,11 @@ import com.couchbase.libcouch.ICouchService;
 
 public class Main extends Activity {
 
-    private final static String ACTION = "com.couchone.libcouch.ICouchService";
     // private static final String TAG = "Main";
+    private final static String ACTION = "com.couchone.libcouch.ICouchService";
+    private final static String DBNAME = "contacts";
+    private final static String ADMIN_USR = "admin"; // FIXME
+    private final static String ADMIN_PWD = "1234";
     private String mHost;
     private int mPort;
 
@@ -66,18 +64,19 @@ public class Main extends Activity {
             public void onClick(View v) {
                 // Server -> Local
                 new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
-                        + getString(R.string.server_master)
-                        + "\",\"target\":\"contacts\",\"create_target\":true,\"continuous\":true}")
-                        .execute();
+                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
+                        + "\",\"target\":\"" + DBNAME
+                        + "\",\"create_target\":true,\"continuous\":true}").execute();
             }
         });
         findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Local -> Server
-                new RequestTask(mHost, mPort, "POST", "_replicate",
-                        "{\"source\":\"contacts\",\"target\":\""
-                                + getString(R.string.server_master) + "\"}").execute();
+                new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
+                        + "\",\"target\":\""
+                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
+                        + "\"}").execute();
             }
         });
     }
@@ -165,7 +164,11 @@ public class Main extends Activity {
 
         @Override
         protected String doInBackground(Void... params) {
-            return Network.request(url, method, data);
+            Network res = Network.request(url, method, data);
+            if (res != null) {
+                return res.result;
+            }
+            return null;
         }
 
         @Override
