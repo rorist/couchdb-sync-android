@@ -1,7 +1,9 @@
 package info.lamatricexiste.budiez;
 
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -41,6 +43,12 @@ public class Main extends Activity {
         startCouch();
 
         // Buttons
+        findViewById(R.id.btn_readdb).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RemoteRequestTask(Main.this, "", "", "GET", "/contacts", "{}", null).execute();
+            }
+        });
         findViewById(R.id.btn_contacts).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,20 +71,20 @@ public class Main extends Activity {
             @Override
             public void onClick(View v) {
                 // Server -> Local
-                new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
+                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
                         + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
                         + "\",\"target\":\"" + DBNAME
-                        + "\",\"create_target\":true,\"continuous\":true}").execute();
+                        + "\",\"create_target\":true,\"continuous\":true}", null).execute();
             }
         });
         findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Local -> Server
-                new RequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
+                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
                         + "\",\"target\":\""
                         + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
-                        + "\"}").execute();
+                        + "\"}", null).execute();
             }
         });
     }
@@ -142,15 +150,18 @@ public class Main extends Activity {
 
     };
 
-    private class RequestTask extends AsyncTask<Void, Void, String> {
+    private class LocalRequestTask extends AsyncTask<Void, Void, String> {
 
         private URL url;
         private String method;
         private String data;
+        private HashMap<String, String> headers;
 
-        RequestTask(String host, int port, String method, String action, String data) {
+        LocalRequestTask(String host, int port, String method, String action, String data,
+                HashMap<String, String> headers) {
             this.method = method;
             this.data = data;
+            this.headers = headers;
             try {
                 url = new URL("http://" + host + ":" + port + "/" + action);
             }
@@ -164,7 +175,7 @@ public class Main extends Activity {
 
         @Override
         protected String doInBackground(Void... params) {
-            Network res = Network.request(url, method, data);
+            Network res = Network.request(url, method, data, headers);
             if (res != null) {
                 return res.result;
             }
@@ -180,7 +191,59 @@ public class Main extends Activity {
         @Override
         protected void onCancelled() {
             setProgressBarIndeterminateVisibility(false);
-            ((TextView) findViewById(R.id.output)).setText("Cancelled");
+            ((TextView) findViewById(R.id.output)).append("Cancelled\n");
+        }
+
+    }
+
+    private class RemoteRequestTask extends AsyncTask<Void, Void, String> {
+
+        private URL url;
+        private String method;
+        private String data;
+        private HashMap<String, String> headers;
+        private WeakReference<Activity> mActivity;
+
+        RemoteRequestTask(Activity ctxt, String user, String pass, String method, String action,
+                String data, HashMap<String, String> headers) {
+            mActivity = new WeakReference<Activity>(ctxt);
+            this.method = method;
+            this.data = data;
+            this.headers = headers;
+            try {
+                url = new URL(getString(R.string.server_master, user, pass) + action);
+            }
+            catch (MalformedURLException e) {}
+        }
+
+        @Override
+        protected void onPreExecute() {
+            setProgressBarIndeterminateVisibility(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            final Activity a = mActivity.get();
+            if (a != null) {
+                Network res = Network.requestWithCookie(a.getApplicationContext(), url, method,
+                        data, headers);
+                if (res != null) {
+                    return res.result;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            setProgressBarIndeterminateVisibility(false);
+            ((TextView) findViewById(R.id.output)).setText(result);
+        }
+
+        @Override
+        protected void onCancelled() {
+            setProgressBarIndeterminateVisibility(false);
+            ((TextView) findViewById(R.id.output)).append("Cancelled\n");
         }
 
     }

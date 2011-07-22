@@ -6,6 +6,7 @@ import info.lamatricexiste.budiez.R;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +81,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 // Make request
                 URL url = new URL(String.format(server_url, user, pass) + "/_session");
                 Log.e(TAG, "url=" + url.toExternalForm());
+                final HashMap<String, String> headers = new HashMap<String, String>(1);
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
                 Network res = Network.request(url, "POST", "name=" + user + "&password=" + pass,
-                        new String[][] { new String[] { "Content-Type",
-                                "application/x-www-form-urlencoded" } });
+                        headers);
                 // Get Cookie
                 Iterator<Entry<String, List<String>>> it = res.headers.entrySet().iterator();
                 while (it.hasNext()) {
