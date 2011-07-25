@@ -86,11 +86,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 Network res = Network.request(url, "POST", "name=" + user + "&password=" + pass,
                         headers);
                 // Get Cookie
-                Iterator<Entry<String, List<String>>> it = res.headers.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, List<String>> pairs = it.next();
-                    if ("set-cookie".equals(pairs.getKey().toLowerCase())) {
-                        token = pairs.getValue().get(0);
+                if (res != null && res.headers != null) {
+                    Iterator<Entry<String, List<String>>> it = res.headers.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, List<String>> pairs = it.next();
+                        if ("set-cookie".equals(pairs.getKey().toLowerCase())) {
+                            token = pairs.getValue().get(0);
+                        }
                     }
                 }
                 // Debug

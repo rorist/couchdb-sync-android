@@ -1,11 +1,16 @@
 package info.lamatricexiste.budiez.authenticator;
 
+import java.io.IOException;
+
 import info.lamatricexiste.budiez.Constants;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
 import android.accounts.NetworkErrorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,7 +58,17 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
         Log.e("Authenticator", "getAuthToken()");
-        return null;
+        final AccountManager am = AccountManager.get(mContext);
+        final String password = am.getPassword(account);
+        AccountManagerFuture<Bundle> bundle = am.getAuthToken(account, authTokenType, options,
+                null, null, null);
+        Log.e("Authenticator", "bundle="+bundle.toString());
+
+        final Bundle result = new Bundle();
+        result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+        result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+        result.putString(AccountManager.KEY_AUTHTOKEN, password);
+        return result;
     }
 
     @Override

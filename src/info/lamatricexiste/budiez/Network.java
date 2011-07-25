@@ -41,11 +41,11 @@ public class Network {
         if (act.length < 1) { // FIXME: add new account
             return null;
         }
+        // FIXME: Is async ?
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(act[0],
                 Constants.AUTHTOKEN_TYPE, true, null, null);
         try {
-            Bundle authTokenBundle = accountManagerFuture.getResult();
-            cookie = authTokenBundle.getString(AccountManager.KEY_AUTHTOKEN);
+            cookie = accountManagerFuture.getResult().getString(AccountManager.KEY_AUTHTOKEN);
         }
         catch (OperationCanceledException e) {
             e.printStackTrace();
@@ -76,6 +76,7 @@ public class Network {
             HashMap<String, String> headers) {
         StringBuffer sb = new StringBuffer();
         try {
+            Log.e(TAG, "url=" + url.toExternalForm());
             HttpURLConnection c = (HttpURLConnection) url.openConnection();
             String charEncoding = "iso-8859-1";
             c.setDoOutput(true);
