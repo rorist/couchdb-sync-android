@@ -34,7 +34,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public static final String PARAM_USERNAME = "username";
     private AccountManager mAccountManager;
     private String mUsername;
-    private String mPassword;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -58,18 +57,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public void handleLogin(View view) {
         Log.e(TAG, "handlLogin()");
         mUsername = ((EditText) findViewById(R.id.username_edit)).getText().toString();
-        mPassword = ((EditText) findViewById(R.id.password_edit)).getText().toString();
-        new AuthTask().execute(mUsername, mPassword);
+        String password = ((EditText) findViewById(R.id.password_edit)).getText().toString();
+        new AuthTask().execute(mUsername, password);
     }
 
     private class AuthTask extends AsyncTask<String, Void, String> {
 
-        private String server_url;
+        private String mServerUrl;
 
         @Override
         protected void onPreExecute() {
             showDialog(0);
-            server_url = getString(R.string.server_master);
+            mServerUrl = getString(R.string.server_master);
         }
 
         @Override
@@ -79,8 +78,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             final String pass = params[1];
             try {
                 // Make request
-                URL url = new URL(String.format(server_url, user, pass) + "/_session");
-                Log.e(TAG, "url=" + url.toExternalForm());
+                final URL url = new URL(String.format(mServerUrl, user, pass) + "/_session");
                 final HashMap<String, String> headers = new HashMap<String, String>(1);
                 headers.put("Content-Type", "application/x-www-form-urlencoded");
                 Network res = Network.request(url, "POST", "name=" + user + "&password=" + pass,
@@ -96,7 +94,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     }
                 }
                 // Debug
-                Log.e(TAG, "STATUS=" + res.status);
                 Log.e(TAG, "RES=" + res.result);
                 Log.e(TAG, "TOKEN=" + token);
             }
@@ -108,7 +105,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         protected void onPostExecute(String token) {
             // Create account
             final Account account = new Account(mUsername, Constants.ACCOUNT_TYPE);
-            mAccountManager.addAccountExplicitly(account, mPassword, null);
+            mAccountManager.addAccountExplicitly(account, token, null);
 
             // Set result intention
             final Intent intent = new Intent();
