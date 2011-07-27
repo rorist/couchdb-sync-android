@@ -20,14 +20,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
-    public static final String TAG = "AuthenticatorActivity";
+    // public static final String TAG = "AuthenticatorActivity";
     public static final String PARAM_CONFIRM_CREDENTIALS = "confirmCredentials";
     public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
     public static final String PARAM_PASSWORD = "password";
@@ -45,7 +44,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        Log.e(TAG, "onCreateDialog()");
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("Authenticating");
         dialog.setIndeterminate(true);
@@ -55,7 +53,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     public void handleLogin(View view) {
-        Log.e(TAG, "handlLogin()");
         mUsername = ((EditText) findViewById(R.id.username_edit)).getText().toString();
         String password = ((EditText) findViewById(R.id.password_edit)).getText().toString();
         new AuthTask().execute(mUsername, password);
@@ -93,9 +90,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                         }
                     }
                 }
-                // Debug
-                Log.e(TAG, "RES=" + res.result);
-                Log.e(TAG, "TOKEN=" + token);
             }
             catch (MalformedURLException e) {}
             return token;

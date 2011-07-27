@@ -38,6 +38,9 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
             Bundle options) throws NetworkErrorException {
         Log.e("Authenticator", "confirmCredentials()");
+        if (options != null) {
+            Log.e("Authenticator", "options=" + options.toString());
+        }
         // Always authentified
         final Bundle result = new Bundle();
         result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
@@ -54,17 +57,29 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
         Log.e("Authenticator", "getAuthToken()");
+        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE)) {
+            final Bundle result = new Bundle();
+            result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
+            return result;
+        }
         final AccountManager am = AccountManager.get(mContext);
         final String token = am.getPassword(account);
-        AccountManagerFuture<Bundle> bundle = am.getAuthToken(account, authTokenType, options,
-                null, null, null);
-        Log.e("Authenticator", "bundle=" + bundle.toString());
-
-        final Bundle result = new Bundle();
-        result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-        result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-        result.putString(AccountManager.KEY_AUTHTOKEN, token);
-        return result;
+        if (token != null) {
+            final Bundle result = new Bundle();
+            result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+            result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+            result.putString(AccountManager.KEY_AUTHTOKEN, token);
+            return result;
+        }
+        // the password was missing or incorrect, return an Intent to an
+        // Activity that will prompt the user for the password.
+        final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
+        intent.putExtra(AuthenticatorActivity.PARAM_USERNAME, account.name);
+        intent.putExtra(AuthenticatorActivity.PARAM_AUTHTOKEN_TYPE, authTokenType);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        final Bundle bundle = new Bundle();
+        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+        return bundle;
     }
 
     @Override
