@@ -56,17 +56,16 @@ public class Main extends Activity {
         findViewById(R.id.btn_contacts).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                TextView tv = (TextView) findViewById(R.id.output);
+                tv.setText("");
                 // Query RAW contact data
                 Cursor c = getContentResolver().query(Data.CONTENT_URI,
                         new String[] { Data._ID, Data.CONTACT_ID, Data.MIMETYPE, Data.DATA1 },
                         null, null, null);
                 // Show to output
                 while (c.moveToNext()) {
-                    ((TextView) findViewById(R.id.output)).append(c.getString(c
-                            .getColumnIndex(Data.CONTACT_ID))
-                            + ": "
-                            + c.getString(c.getColumnIndex(Data.MIMETYPE))
-                            + ", "
+                    tv.append(c.getString(c.getColumnIndex(Data.CONTACT_ID)) + ": "
+                            + c.getString(c.getColumnIndex(Data.MIMETYPE)) + ", "
                             + c.getString(c.getColumnIndex(Data.DATA1)) + "\n");
                 }
             }
