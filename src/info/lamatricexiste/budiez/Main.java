@@ -247,11 +247,13 @@ public class Main extends Activity {
             setProgressBarIndeterminateVisibility(false);
             if (net != null) {
                 ((TextView) findViewById(R.id.output)).setText(net.result);
-                if (net.status == HttpStatus.SC_UNAUTHORIZED) {
+                // Handle errors
+                if (net.status != HttpStatus.SC_OK) {
                     AccountManager mgr = AccountManager.get(Main.this);
                     Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
                     if (act.length >= 1) {
                         mgr.confirmCredentials(act[0], null, Main.this, null, null);
+                        // TODO: Do request again
                     }
                 }
             }
