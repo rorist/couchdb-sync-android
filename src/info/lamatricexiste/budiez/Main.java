@@ -5,6 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import org.apache.http.HttpStatus;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -198,7 +202,7 @@ public class Main extends Activity {
 
     }
 
-    private class RemoteRequestTask extends AsyncTask<Void, Void, String> {
+    private class RemoteRequestTask extends AsyncTask<Void, Void, Network> {
 
         private URL url;
         private String method;
@@ -229,22 +233,28 @@ public class Main extends Activity {
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected Network doInBackground(Void... params) {
             final Activity a = mActivity.get();
             if (a != null) {
-                Network res = Network.requestWithCookie(a.getApplicationContext(), url, method,
-                        data, headers);
-                if (res != null) {
-                    return res.result;
-                }
+                return Network.requestWithCookie(a.getApplicationContext(), url, method, data,
+                        headers);
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Network net) {
             setProgressBarIndeterminateVisibility(false);
-            ((TextView) findViewById(R.id.output)).setText(result);
+            if (net != null) {
+                ((TextView) findViewById(R.id.output)).setText(net.result);
+                if (net.status == HttpStatus.SC_UNAUTHORIZED) {
+                    AccountManager mgr = AccountManager.get(Main.this);
+                    Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
+                    if (act.length >= 1) {
+                        mgr.confirmCredentials(act[0], null, Main.this, null, null);
+                    }
+                }
+            }
         }
 
         @Override

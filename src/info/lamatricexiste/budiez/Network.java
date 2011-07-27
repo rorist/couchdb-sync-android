@@ -36,7 +36,7 @@ public class Network {
             String data, HashMap<String, String> headers) {
         // Get cookie token in account manager
         String cookie = "";
-        AccountManager mgr = AccountManager.get(ctxt); // TODO: Check context
+        AccountManager mgr = AccountManager.get(ctxt);
         Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
         if (act.length < 1) { // FIXME: add new account
             return null;
@@ -109,8 +109,7 @@ public class Network {
             catch (NullPointerException e) {}
             catch (StringIndexOutOfBoundsException e) {
                 // FIXME: Android bug: http://code.google.com/p/android/issues/detail?id=18856
-                // TODO: Ask for auth
-                return null;
+                return new Network(null, null, 401);
             }
             finally {
                 c.disconnect();

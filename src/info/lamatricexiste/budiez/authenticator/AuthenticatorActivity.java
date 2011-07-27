@@ -26,7 +26,7 @@ import android.widget.EditText;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
-    // public static final String TAG = "AuthenticatorActivity";
+    public static final String TAG = "AuthenticatorActivity";
     public static final String PARAM_CONFIRM_CREDENTIALS = "confirmCredentials";
     public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
     public static final String PARAM_PASSWORD = "password";
@@ -97,9 +97,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         @Override
         protected void onPostExecute(String token) {
-            // Create account
+            // Create new account or update password token of existing one
             final Account account = new Account(mUsername, Constants.ACCOUNT_TYPE);
-            mAccountManager.addAccountExplicitly(account, token, null);
+            if (!mAccountManager.addAccountExplicitly(account, token, null)) {
+                mAccountManager.setPassword(account, token);
+            }
+            // ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
 
             // Set result intention
             final Intent intent = new Intent();
