@@ -46,7 +46,7 @@ public class Main extends Activity {
         findViewById(R.id.btn_readdb).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                new RemoteRequestTask(Main.this, "", "", "GET", "/contacts", "{}", null).execute();
+                new RemoteRequestTask(Main.this, "GET", "contacts", "{}", null).execute();
             }
         });
         findViewById(R.id.btn_contacts).setOnClickListener(new OnClickListener() {
@@ -72,7 +72,7 @@ public class Main extends Activity {
             public void onClick(View v) {
                 // Server -> Local
                 new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
-                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
+                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
                         + "\",\"target\":\"" + DBNAME
                         + "\",\"create_target\":true,\"continuous\":true}", null).execute();
             }
@@ -83,8 +83,8 @@ public class Main extends Activity {
                 // Local -> Server
                 new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
                         + "\",\"target\":\""
-                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD) + "/" + DBNAME
-                        + "\"}", null).execute();
+                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME) + "\"}",
+                        null).execute();
             }
         });
     }
@@ -211,9 +211,14 @@ public class Main extends Activity {
             this.data = data;
             this.headers = headers;
             try {
-                url = new URL(getString(R.string.server_master, user, pass) + action);
+                url = new URL(getString(R.string.server_master, user, pass, action));
             }
             catch (MalformedURLException e) {}
+        }
+
+        RemoteRequestTask(Activity ctxt, String method, String action, String data,
+                HashMap<String, String> headers) {
+            this(ctxt, "", "", method, action, data, headers);
         }
 
         @Override

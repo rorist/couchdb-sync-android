@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">BuDieZ</string>
     <string name="accout_label">BuDieZ</string>
-<!--    <string name="server_master">http://%1$s:%2$s@example.com:2222</string>-->
+<!--    <string name="server_master">http://%1$s:%2$s@example.com:2222/%3$s</string>-->
 </resources>

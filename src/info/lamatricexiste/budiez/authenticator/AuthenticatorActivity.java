@@ -75,7 +75,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             final String pass = params[1];
             try {
                 // Make request
-                final URL url = new URL(String.format(mServerUrl, user, pass) + "/_session");
+                final URL url = new URL(String.format(mServerUrl, user, pass, "_session"));
                 final HashMap<String, String> headers = new HashMap<String, String>(1);
                 headers.put("Content-Type", "application/x-www-form-urlencoded");
                 Network res = Network.request(url, "POST", "name=" + user + "&password=" + pass,
