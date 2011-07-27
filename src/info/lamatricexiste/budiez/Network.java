@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
@@ -17,19 +19,23 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 public class Network {
 
     public static final String TAG = "Network";
     public Map<String, List<String>> headers;
-    public String result;
-    public int status;
+    public String error = null;
+    public String result = null;
+    public int status = HttpStatus.SC_OK;
 
     public Network(Map<String, List<String>> headers, String result, int status) {
         this.headers = headers;
         this.result = result;
         this.status = status;
+    }
+
+    public Network(String error) {
+        this.error = error;
     }
 
     public static Network requestWithCookie(final Context ctxt, URL url, String method,
@@ -41,7 +47,6 @@ public class Network {
         if (act.length < 1) { // FIXME: add new account
             return null;
         }
-        // FIXME: Is async ?
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(act[0],
                 Constants.AUTHTOKEN_TYPE, true, null, null);
         try {
@@ -58,7 +63,6 @@ public class Network {
         }
 
         // Set cookie in headers
-        Log.e(TAG, "cookie=" + cookie);
         if (headers == null) {
             headers = new HashMap<String, String>(3);
         }
@@ -118,7 +122,7 @@ public class Network {
         }
         catch (IOException e) {
             e.printStackTrace();
+            return new Network(e.getLocalizedMessage());
         }
-        return null;
     }
 }

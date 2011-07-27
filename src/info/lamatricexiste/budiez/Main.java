@@ -183,7 +183,12 @@ public class Main extends Activity {
         protected String doInBackground(Void... params) {
             Network res = Network.request(url, method, data, headers);
             if (res != null) {
-                return res.result;
+                if (res.error != null) {
+                    return res.error;
+                }
+                else {
+                    return res.result;
+                }
             }
             return null;
         }
