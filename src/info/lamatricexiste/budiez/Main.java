@@ -165,7 +165,9 @@ public class Main extends Activity {
             try {
                 url = new URL("http://" + host + ":" + port + "/" + action);
             }
-            catch (MalformedURLException e) {}
+            catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
