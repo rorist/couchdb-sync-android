@@ -26,11 +26,7 @@ import android.widget.EditText;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
-    public static final String TAG = "AuthenticatorActivity";
-    public static final String PARAM_CONFIRM_CREDENTIALS = "confirmCredentials";
-    public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
-    public static final String PARAM_PASSWORD = "password";
-    public static final String PARAM_USERNAME = "username";
+    // private static final String TAG = "AuthenticatorActivity";
     private AccountManager mAccountManager;
     private String mUsername;
 
