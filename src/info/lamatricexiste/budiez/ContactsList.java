@@ -22,7 +22,8 @@ import android.widget.SimpleAdapter;
 
 public class ContactsList extends ListActivity {
 
-    private final static String NAME = "id";
+    private final static String NAME = "title";
+    private final static String ID = "id";
     private final ArrayList<HashMap<String, String>> mList = new ArrayList<HashMap<String, String>>();
     private SimpleAdapter mAdapter;
 
@@ -33,11 +34,12 @@ public class ContactsList extends ListActivity {
         setContentView(R.layout.list);
 
         // Get data
-        new RemoteRequestTask(ContactsList.this, "GET", "contacts/_all_docs", "", null).execute();
+        new RemoteRequestTask(ContactsList.this, "GET", "contacts/_design/read/_view/titles", "",
+                null).execute();
 
         // Show data
         mAdapter = new SimpleAdapter(ContactsList.this, mList, android.R.layout.two_line_list_item,
-                new String[] { NAME }, new int[] { android.R.id.text1 });
+                new String[] { NAME, ID }, new int[] { android.R.id.text1, android.R.id.text2 });
         setListAdapter(mAdapter);
     }
 
@@ -101,7 +103,9 @@ public class ContactsList extends ListActivity {
                         JSONArray rows = res.getJSONArray("rows");
                         for (int i = 0; i < rows.length(); i++) {
                             HashMap<String, String> entry = new HashMap<String, String>(1);
-                            entry.put(NAME, rows.getJSONObject(i).getString(NAME));
+                            JSONObject contact = rows.getJSONObject(i).getJSONObject("value");
+                            entry.put(NAME, contact.getString("title"));
+                            entry.put(ID, contact.getString("id"));
                             mList.add(entry);
                         }
                         mAdapter.notifyDataSetChanged();
