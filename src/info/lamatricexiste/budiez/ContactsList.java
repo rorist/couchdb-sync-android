@@ -1,38 +1,46 @@
 package info.lamatricexiste.budiez;
 
+import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONObject;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.ListActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract.Data;
-import android.widget.ListAdapter;
+import android.view.Window;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 public class ContactsList extends ListActivity {
 
-    private final static String NAME = "name";
+    private final static String NAME = "id";
     private final ArrayList<HashMap<String, String>> mList = new ArrayList<HashMap<String, String>>();
-    private ListAdapter mAdapter;
+    private SimpleAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.list);
 
         // Get data
         new RemoteRequestTask(ContactsList.this, "GET", "contacts/_all_docs", "", null).execute();
 
         // Show data
-        mAdapter = new SimpleAdapter(ContactsList.this, list, android.R.id.list, new String[] { NAME }, new int[] { android.R.id.text1 });
+        mAdapter = new SimpleAdapter(ContactsList.this, mList, android.R.layout.two_line_list_item,
+                new String[] { NAME }, new int[] { android.R.id.text1 });
         setListAdapter(mAdapter);
     }
-    
+
     private class RemoteRequestTask extends AsyncTask<Void, Void, Network> {
 
         private URL url;
@@ -77,7 +85,6 @@ public class ContactsList extends ListActivity {
         protected void onPostExecute(Network net) {
             setProgressBarIndeterminateVisibility(false);
             if (net != null) {
-                ((TextView) findViewById(R.id.output)).setText(net.result);
                 // Handle errors
                 if (net.status != HttpStatus.SC_OK) {
                     AccountManager mgr = AccountManager.get(ContactsList.this);
@@ -86,14 +93,22 @@ public class ContactsList extends ListActivity {
                         mgr.confirmCredentials(act[0], null, ContactsList.this, null, null);
                         // TODO: Do request again
                     }
-                } else {
-                    // Handle results
-                    JSONObject res = new JSONObject(net.result);
-                    JSONArray rows = res.getJSONArray("rows");
-                    for(int i=0; i<rows.length(); i++){
-                        mList.add(new HashMap<String, String>());
+                }
+                else {
+                    try {
+                        // Handle results
+                        JSONObject res = new JSONObject(net.result);
+                        JSONArray rows = res.getJSONArray("rows");
+                        for (int i = 0; i < rows.length(); i++) {
+                            HashMap<String, String> entry = new HashMap<String, String>(1);
+                            entry.put(NAME, rows.getJSONObject(i).getString(NAME));
+                            mList.add(entry);
+                        }
+                        mAdapter.notifyDataSetChanged();
                     }
-                    mAdapter.notifyDataSetChanged();
+                    catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -101,7 +116,6 @@ public class ContactsList extends ListActivity {
         @Override
         protected void onCancelled() {
             setProgressBarIndeterminateVisibility(false);
-            ((TextView) findViewById(R.id.output)).append("Cancelled\n");
         }
 
     }

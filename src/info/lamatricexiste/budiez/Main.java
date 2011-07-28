@@ -47,6 +47,12 @@ public class Main extends Activity {
         startCouch();
 
         // Buttons
+        findViewById(R.id.btn_list).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Main.this, ContactsList.class));
+            }
+        });
         findViewById(R.id.btn_readdb).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
