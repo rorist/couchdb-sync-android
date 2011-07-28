@@ -15,6 +15,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Window;
@@ -93,7 +94,7 @@ public class ContactsList extends ListActivity {
                     Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
                     if (act.length >= 1) {
                         mgr.confirmCredentials(act[0], null, ContactsList.this, null, null);
-                        // TODO: Do request again
+                        finish();
                     }
                 }
                 else {

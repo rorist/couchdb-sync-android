@@ -47,6 +47,24 @@ public class Main extends Activity {
         startCouch();
 
         // Buttons
+        findViewById(R.id.btn_status).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RemoteRequestTask(Main.this, "GET", "_session").execute();
+            }
+        });
+        findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RemoteRequestTask(Main.this, "POST", "_session").execute();
+            }
+        });
+        findViewById(R.id.btn_logout).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RemoteRequestTask(Main.this, "DELETE", "_session").execute();
+            }
+        });
         findViewById(R.id.btn_list).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,6 +255,10 @@ public class Main extends Activity {
             this(ctxt, "", "", method, action, data, headers);
         }
 
+        RemoteRequestTask(Activity ctxt, String method, String action) {
+            this(ctxt, "", "", method, action, null, null);
+        }
+
         @Override
         protected void onPreExecute() {
             setProgressBarIndeterminateVisibility(true);
@@ -263,7 +285,7 @@ public class Main extends Activity {
                     Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
                     if (act.length >= 1) {
                         mgr.confirmCredentials(act[0], null, Main.this, null, null);
-                        // TODO: Do request again
+                        // execute(); // FIXME: Execute request again
                     }
                 }
             }

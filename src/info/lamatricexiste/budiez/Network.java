@@ -7,8 +7,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpStatus;
 
@@ -19,6 +21,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 public class Network {
 
@@ -44,7 +47,8 @@ public class Network {
         String cookie = "";
         AccountManager mgr = AccountManager.get(ctxt);
         Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
-        if (act.length < 1) { // FIXME: add new account
+        if (act.length == 0) {
+            Log.e(TAG, "FIXME: add new account"); // FIXME
             return null;
         }
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(act[0],
@@ -63,13 +67,31 @@ public class Network {
         }
 
         // Set cookie in headers
+        Log.e(TAG, "cookie=" + cookie);
         if (headers == null) {
             headers = new HashMap<String, String>(3);
         }
         headers.put("Cookie", cookie);
         headers.put("X-CouchDB-WWW-Authenticate", "Cookie");
         headers.put("Content-Type", "application/x-www-form-urlencoded");
-        return request(url, method, data, headers);
+        Network net = request(url, method, data, headers);
+
+        // Save cookie response
+        if (net != null && net.headers != null) {
+            String token = null;
+            Iterator<Entry<String, List<String>>> it = net.headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, List<String>> pairs = it.next();
+                if ("set-cookie".equals(pairs.getKey().toLowerCase())) {
+                    token = pairs.getValue().get(0);
+                }
+            }
+            if (token != null && !token.equals(cookie)) {
+                mgr.setPassword(act[0], token);
+            }
+        }
+
+        return net;
     }
 
     public static Network request(URL url, String method, String data) {
@@ -91,7 +113,7 @@ public class Network {
                     c.setRequestProperty(entry.getKey(), entry.getValue());
                 }
             }
-            if (method != "GET" && data != null) {
+            if (!"GET".equals(method) && !"DELETE".equals(method) && data != null) {
                 c.setDoInput(true);
                 c.setRequestProperty("Content-Length", Integer.toString(data.length()));
                 c.getOutputStream().write(data.getBytes(charEncoding));
