@@ -262,6 +262,13 @@ public class Main extends Activity {
         @Override
         protected void onPreExecute() {
             setProgressBarIndeterminateVisibility(true);
+            // Check for an existing account first
+            AccountManager mgr = AccountManager.get(Main.this);
+            Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
+            if (act.length == 0) {
+                mgr.addAccount(Constants.ACCOUNT_TYPE, Constants.AUTHTOKEN_TYPE, null, null,
+                        Main.this, null, null);
+            }
         }
 
         @Override
@@ -283,10 +290,8 @@ public class Main extends Activity {
                 if (net.status != HttpStatus.SC_OK) {
                     AccountManager mgr = AccountManager.get(Main.this);
                     Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
-                    if (act.length >= 1) {
-                        mgr.confirmCredentials(act[0], null, Main.this, null, null);
-                        // execute(); // FIXME: Execute request again
-                    }
+                    mgr.confirmCredentials(act[0], null, Main.this, null, null);
+                    // execute(); // FIXME: Execute request again
                 }
             }
         }

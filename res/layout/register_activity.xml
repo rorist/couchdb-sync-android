@@ -32,9 +32,8 @@
                 android:scrollHorizontally="true"
                 android:capitalize="none"
                 android:autoText="false"
-                android:inputType="textEmailAddress"
-                android:hint="Username"
-                android:text="rorist" />
+                android:inputType="text"
+                android:hint="Username" />
             <EditText
                 android:id="@+id/password_edit"
                 android:singleLine="true"
@@ -46,8 +45,30 @@
                 android:autoText="false"
                 android:password="true"
                 android:inputType="textPassword"
-                android:hint="Password"
-                android:text="1234" />
+                android:hint="Password" />
+            <EditText
+                android:id="@+id/password_confirm"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:password="true"
+                android:inputType="textPassword"
+                android:hint="Confirm password" />
+            <EditText
+                android:id="@+id/email_edit"
+                android:singleLine="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:capitalize="none"
+                android:autoText="false"
+                android:inputType="textEmailAddress"
+                android:hint="Email" />
             <TextView
                 android:id="@+id/message_bottom"
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -68,8 +89,8 @@
 		            android:layout_height="wrap_content"
 		            android:layout_gravity="center_horizontal"
 		            android:minWidth="100dip"
-		            android:text="Login"
-		            android:onClick="handleLogin" />
+		            android:text="Register"
+		            android:onClick="handleRegister" />
 		    </FrameLayout>
 		    <TextView
 		        android:textAppearance="?android:attr/textAppearanceMedium"
@@ -80,12 +101,12 @@
 		        android:layout_gravity="center_horizontal"
 		        android:text="- OR -" />
 		    <Button
-		        android:id="@+id/switch_register"
+		        android:id="@+id/switch_login"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center_horizontal"
 		        android:minWidth="100dip"
-		        android:text="Register"
+		        android:text="Login"
 		        android:onClick="switchForm" />
         </LinearLayout>
     </ScrollView>

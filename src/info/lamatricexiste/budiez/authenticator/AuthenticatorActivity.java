@@ -20,22 +20,39 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
-    // private static final String TAG = "AuthenticatorActivity";
+    private static final String TAG = "AuthenticatorActivity";
     private AccountManager mAccountManager;
     private String mUsername;
+    private boolean mRequestNewAccount = false;
 
     @Override
     public void onCreate(Bundle icicle) {
+        Log.e(TAG, "onCreate()");
         super.onCreate(icicle);
-        mAccountManager = AccountManager.get(this);
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
-        setContentView(R.layout.login_activity);
+
+        final Intent intent = getIntent();
+        mAccountManager = AccountManager.get(this);
+        mUsername = intent.getStringExtra(Constants.PARAM_USERNAME);
+        mRequestNewAccount = mUsername == null;
+
+        if (mRequestNewAccount) {
+            // Register
+            setContentView(R.layout.register_activity);
+            setTitle("Register");
+        }
+        else {
+            // Login
+            setContentView(R.layout.login_activity);
+            setTitle("Log-In");
+        }
     }
 
     @Override
@@ -49,9 +66,31 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     public void handleLogin(View view) {
+        Log.e(TAG, "handleLogin()");
         mUsername = ((EditText) findViewById(R.id.username_edit)).getText().toString();
         String password = ((EditText) findViewById(R.id.password_edit)).getText().toString();
         new AuthTask().execute(mUsername, password);
+    }
+
+    public void handleRegister(View view) {
+        Log.e(TAG, "handleRegister()");
+        // mUsername = ((EditText) findViewById(R.id.username_edit)).getText().toString();
+        // String password = ((EditText) findViewById(R.id.password_edit)).getText().toString();
+    }
+
+    public void switchForm(View view) {
+        int layout = view.getId();
+        switch (layout) {
+            case R.id.switch_login:
+                setContentView(R.layout.login_activity);
+                setTitle("Log-In");
+                break;
+            case R.id.switch_register:
+            default:
+                setContentView(R.layout.register_activity);
+                setTitle("Register");
+                break;
+        }
     }
 
     private class AuthTask extends AsyncTask<String, Void, String> {

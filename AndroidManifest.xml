@@ -21,8 +21,6 @@
         
         <activity
             android:name=".authenticator.AuthenticatorActivity"
-            android:label="Sign-in"
-            android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true" />
         
         <service

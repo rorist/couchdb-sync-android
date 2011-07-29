@@ -48,7 +48,6 @@ public class Network {
         AccountManager mgr = AccountManager.get(ctxt);
         Account[] act = mgr.getAccountsByType(Constants.ACCOUNT_TYPE);
         if (act.length == 0) {
-            Log.e(TAG, "FIXME: add new account"); // FIXME
             return null;
         }
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(act[0],
