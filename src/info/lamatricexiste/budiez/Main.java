@@ -27,12 +27,10 @@ import com.couchbase.libcouch.ICouchClient;
 
 public class Main extends Activity {
 
-    // private static final String TAG = "Main";
-    private final static String ACTION = "com.couchbase.libcouch.ICouchService";
-
-    // private final static String DBNAME = "contacts";
-    // private final static String ADMIN_USR = "admin"; // FIXME
-    // private final static String ADMIN_PWD = "1234";
+    private final static String DBNAME = "contacts";
+    private final static String ADMIN_USR = "admin"; // FIXME
+    private final static String ADMIN_PWD = "1234";
+    private ServiceConnection couchServiceConnection;
     private String mHost;
     private int mPort;
 
@@ -41,6 +39,9 @@ public class Main extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.main);
+
+        // Start service
+        setProgressBarIndeterminate(true);
         startCouch();
 
         // Buttons
@@ -68,10 +69,21 @@ public class Main extends Activity {
                 new RemoteRequestTask(Main.this, "GET", "contacts", "{}", null).execute();
             }
         });
-        findViewById(R.id.btn_list).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.btn_remote).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Main.this, ContactsList.class));
+            }
+        });
+        findViewById(R.id.btn_local).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main.this, ContactsList.class);
+                intent.setAction(Constants.ACTION_LOCAL_LIST);
+                Bundle data = new Bundle();
+                data.putString(Constants.DATA_HOST, mHost);
+                data.putInt(Constants.DATA_PORT, mPort);
+                startActivity(intent);
             }
         });
         // findViewById(R.id.btn_contacts).setOnClickListener(new
@@ -93,18 +105,16 @@ public class Main extends Activity {
         // }
         // }
         // });
-        // findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener()
-        // {
-        // @Override
-        // public void onClick(View v) {
-        // // Server -> Local
-        // new LocalRequestTask(mHost, mPort, "POST", "_replicate",
-        // "{\"source\":\""
-        // + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
-        // + "\",\"target\":\"" + DBNAME
-        // + "\",\"create_target\":true,\"continuous\":true}", null).execute();
-        // }
-        // });
+        findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Server -> Local
+                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
+                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
+                        + "\",\"target\":\"" + DBNAME
+                        + "\",\"create_target\":true,\"continuous\":true}", null).execute();
+            }
+        });
         // findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener()
         // {
         // @Override
@@ -136,33 +146,9 @@ public class Main extends Activity {
     }
 
     private void startCouch() {
-        // bindService(new Intent(ACTION), couchServiceConnection,
-        // Context.BIND_AUTO_CREATE);
         couchServiceConnection = CouchDB.getService(getBaseContext(), null, "release-0.1",
                 couchClient);
     }
-
-    private ServiceConnection couchServiceConnection;
-    // private ServiceConnection couchServiceConnection = new
-    // ServiceConnection() {
-    // private ICouchService couchService;
-    //
-    // @Override
-    // public void onServiceConnected(ComponentName name, IBinder service) {
-    // couchService = ICouchService.Stub.asInterface(service);
-    // try {
-    // couchService.initCouchDB(couchClient, null, "release-0.1");
-    // } catch (RemoteException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    //
-    // @Override
-    // public void onServiceDisconnected(ComponentName name) {
-    // couchService = null;
-    // }
-    //
-    // };
 
     private ICouchClient couchClient = new ICouchClient.Stub() {
 
@@ -171,6 +157,7 @@ public class Main extends Activity {
         @Override
         public void couchStarted(String host, int port) throws RemoteException {
             Log.e("Main", "host=" + host + ", port=" + port);
+            setProgressBarIndeterminate(false);
             mHost = host;
             mPort = port;
         }

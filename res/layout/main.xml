@@ -43,36 +43,36 @@
             android:layout_height="wrap_content"
             android:text="DB Info" />
         <Button
-            android:id="@+id/btn_list"
+            android:id="@+id/btn_remote"
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
             android:text="Contacts remote" /> 
         <Button
-            android:id="@+id/btn_contacts"
+            android:id="@+id/btn_local"
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
-            android:text="Contacts phone" />
+            android:text="Contacts local" />
     </LinearLayout>
     
-<!--    <TextView-->
-<!--        android:layout_width="fill_parent" -->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="@android:color/background_light"-->
-<!--        android:text="Replication" />-->
-<!--    <LinearLayout-->
-<!--        android:layout_width="fill_parent" -->
-<!--        android:layout_height="wrap_content">-->
-<!--        <Button-->
-<!--            android:id="@+id/btn_rep1"-->
-<!--            android:layout_width="wrap_content" -->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="server->local (continuous)" />-->
+    <TextView
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_light"
+        android:text="Replication" />
+    <LinearLayout
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btn_rep1"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="server->local (continuous)" />
 <!--        <Button-->
 <!--            android:id="@+id/btn_rep2"-->
 <!--            android:layout_width="wrap_content" -->
 <!--            android:layout_height="wrap_content"-->
 <!--            android:text="local->server" />-->
-<!--    </LinearLayout>-->
+    </LinearLayout>
     
     <TextView
         android:layout_width="fill_parent" 
