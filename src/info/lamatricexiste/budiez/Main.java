@@ -10,32 +10,29 @@ import org.apache.http.HttpStatus;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
-import android.provider.ContactsContract.Data;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
+import com.couchbase.libcouch.CouchDB;
 import com.couchbase.libcouch.ICouchClient;
-import com.couchbase.libcouch.ICouchService;
 
 public class Main extends Activity {
 
     // private static final String TAG = "Main";
-    private final static String ACTION = "com.couchone.libcouch.ICouchService";
-    private final static String DBNAME = "contacts";
-    private final static String ADMIN_USR = "admin"; // FIXME
-    private final static String ADMIN_PWD = "1234";
+    private final static String ACTION = "com.couchbase.libcouch.ICouchService";
+
+    // private final static String DBNAME = "contacts";
+    // private final static String ADMIN_USR = "admin"; // FIXME
+    // private final static String ADMIN_PWD = "1234";
     private String mHost;
     private int mPort;
 
@@ -139,30 +136,37 @@ public class Main extends Activity {
     }
 
     private void startCouch() {
-        bindService(new Intent(ACTION), couchServiceConnection, Context.BIND_AUTO_CREATE);
+        // bindService(new Intent(ACTION), couchServiceConnection,
+        // Context.BIND_AUTO_CREATE);
+        couchServiceConnection = CouchDB.getService(getBaseContext(), null, "release-0.1",
+                couchClient);
     }
 
-    private ServiceConnection couchServiceConnection = new ServiceConnection() {
-        private ICouchService couchService;
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            couchService = ICouchService.Stub.asInterface(service);
-            try {
-                couchService.initCouchDB(couchClient, null, "release-0.1");
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            couchService = null;
-        }
-
-    };
+    private ServiceConnection couchServiceConnection;
+    // private ServiceConnection couchServiceConnection = new
+    // ServiceConnection() {
+    // private ICouchService couchService;
+    //
+    // @Override
+    // public void onServiceConnected(ComponentName name, IBinder service) {
+    // couchService = ICouchService.Stub.asInterface(service);
+    // try {
+    // couchService.initCouchDB(couchClient, null, "release-0.1");
+    // } catch (RemoteException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    //
+    // @Override
+    // public void onServiceDisconnected(ComponentName name) {
+    // couchService = null;
+    // }
+    //
+    // };
 
     private ICouchClient couchClient = new ICouchClient.Stub() {
+
+        private ProgressDialog mDialog = null;
 
         @Override
         public void couchStarted(String host, int port) throws RemoteException {
@@ -178,7 +182,17 @@ public class Main extends Activity {
 
         @Override
         public void installing(int completed, int total) throws RemoteException {
-            Log.e("INSTALL", completed + " / " + total);
+            if (mDialog == null) {
+                mDialog = ProgressDialog.show(Main.this, "CouchDB Installation", completed + " / "
+                        + total);
+                mDialog.setMax(total);
+                mDialog.setCancelable(false);
+            }
+            mDialog.setMessage(completed + " / " + total);
+            mDialog.setProgress(completed);
+            if (completed == total - 1) {
+                mDialog.dismiss();
+            }
         }
 
     };
