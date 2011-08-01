@@ -54,25 +54,25 @@
             android:text="Contacts phone" />
     </LinearLayout>
     
-    <TextView
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:background="@android:color/background_light"
-        android:text="Replication" />
-    <LinearLayout
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/btn_rep1"
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            android:text="server->local (continuous)" />
-        <Button
-            android:id="@+id/btn_rep2"
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            android:text="local->server" />
-    </LinearLayout>
+<!--    <TextView-->
+<!--        android:layout_width="fill_parent" -->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@android:color/background_light"-->
+<!--        android:text="Replication" />-->
+<!--    <LinearLayout-->
+<!--        android:layout_width="fill_parent" -->
+<!--        android:layout_height="wrap_content">-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_rep1"-->
+<!--            android:layout_width="wrap_content" -->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="server->local (continuous)" />-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_rep2"-->
+<!--            android:layout_width="wrap_content" -->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="local->server" />-->
+<!--    </LinearLayout>-->
     
     <TextView
         android:layout_width="fill_parent" 

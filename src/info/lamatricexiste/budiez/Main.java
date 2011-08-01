@@ -65,55 +65,62 @@ public class Main extends Activity {
                 new RemoteRequestTask(Main.this, "DELETE", "_session").execute();
             }
         });
-        findViewById(R.id.btn_list).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Main.this, ContactsList.class));
-            }
-        });
         findViewById(R.id.btn_readdb).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new RemoteRequestTask(Main.this, "GET", "contacts", "{}", null).execute();
             }
         });
-        findViewById(R.id.btn_contacts).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.btn_list).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView tv = (TextView) findViewById(R.id.output);
-                tv.setText("");
-                // Query RAW contact data
-                Cursor c = getContentResolver().query(Data.CONTENT_URI,
-                        new String[] { Data._ID, Data.CONTACT_ID, Data.MIMETYPE, Data.DATA1 },
-                        null, null, null);
-                // Show to output
-                while (c.moveToNext()) {
-                    tv.append(c.getString(c.getColumnIndex(Data.CONTACT_ID)) + ": "
-                            + c.getString(c.getColumnIndex(Data.MIMETYPE)) + ", "
-                            + c.getString(c.getColumnIndex(Data.DATA1)) + "\n");
-                }
+                startActivity(new Intent(Main.this, ContactsList.class));
             }
         });
-        findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Server -> Local
-                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\""
-                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
-                        + "\",\"target\":\"" + DBNAME
-                        + "\",\"create_target\":true,\"continuous\":true}", null).execute();
-            }
-        });
-        findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Local -> Server
-                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
-                        + "\",\"target\":\""
-                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME) + "\"}",
-                        null).execute();
-            }
-        });
+        // findViewById(R.id.btn_contacts).setOnClickListener(new
+        // OnClickListener() {
+        // @Override
+        // public void onClick(View v) {
+        // TextView tv = (TextView) findViewById(R.id.output);
+        // tv.setText("");
+        // // Query RAW contact data
+        // Cursor c = getContentResolver().query(Data.CONTENT_URI,
+        // new String[] { Data._ID, Data.CONTACT_ID, Data.MIMETYPE, Data.DATA1
+        // },
+        // null, null, null);
+        // // Show to output
+        // while (c.moveToNext()) {
+        // tv.append(c.getString(c.getColumnIndex(Data.CONTACT_ID)) + ": "
+        // + c.getString(c.getColumnIndex(Data.MIMETYPE)) + ", "
+        // + c.getString(c.getColumnIndex(Data.DATA1)) + "\n");
+        // }
+        // }
+        // });
+        // findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener()
+        // {
+        // @Override
+        // public void onClick(View v) {
+        // // Server -> Local
+        // new LocalRequestTask(mHost, mPort, "POST", "_replicate",
+        // "{\"source\":\""
+        // + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
+        // + "\",\"target\":\"" + DBNAME
+        // + "\",\"create_target\":true,\"continuous\":true}", null).execute();
+        // }
+        // });
+        // findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener()
+        // {
+        // @Override
+        // public void onClick(View v) {
+        // // Local -> Server
+        // new LocalRequestTask(mHost, mPort, "POST", "_replicate",
+        // "{\"source\":\"" + DBNAME
+        // + "\",\"target\":\""
+        // + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME) +
+        // "\"}",
+        // null).execute();
+        // }
+        // });
     }
 
     @Override
@@ -127,8 +134,8 @@ public class Main extends Activity {
         super.onDestroy();
         try {
             unbindService(couchServiceConnection);
+        } catch (IllegalArgumentException e) {
         }
-        catch (IllegalArgumentException e) {}
     }
 
     private void startCouch() {
@@ -143,8 +150,7 @@ public class Main extends Activity {
             couchService = ICouchService.Stub.asInterface(service);
             try {
                 couchService.initCouchDB(couchClient, null, "release-0.1");
-            }
-            catch (RemoteException e) {
+            } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
@@ -191,8 +197,7 @@ public class Main extends Activity {
             this.headers = headers;
             try {
                 url = new URL("http://" + host + ":" + port + "/" + action);
-            }
-            catch (MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }
@@ -208,8 +213,7 @@ public class Main extends Activity {
             if (res != null) {
                 if (res.error != null) {
                     return res.error;
-                }
-                else {
+                } else {
                     return res.result;
                 }
             }
@@ -246,8 +250,8 @@ public class Main extends Activity {
             this.headers = headers;
             try {
                 url = new URL(getString(R.string.server_master, user, pass, action));
+            } catch (MalformedURLException e) {
             }
-            catch (MalformedURLException e) {}
         }
 
         RemoteRequestTask(Activity ctxt, String method, String action, String data,
