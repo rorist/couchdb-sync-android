@@ -94,7 +94,8 @@ public class Main extends Activity {
                 }
             }
         });
-        findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener() {
+        // Use Case 1
+        findViewById(R.id.btn_case1).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Server -> Local
@@ -102,16 +103,6 @@ public class Main extends Activity {
                         + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME)
                         + "\",\"target\":\"" + DBNAME
                         + "\",\"create_target\":true,\"continuous\":true}", null).execute();
-            }
-        });
-        findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Local -> Server
-                new LocalRequestTask(mHost, mPort, "POST", "_replicate", "{\"source\":\"" + DBNAME
-                        + "\",\"target\":\""
-                        + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME) + "\"}",
-                        null).execute();
             }
         });
     }

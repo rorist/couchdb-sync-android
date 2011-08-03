@@ -58,20 +58,30 @@
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
         android:background="@android:color/background_light"
-        android:text="Replication" />
+        android:text="Use case" />
     <LinearLayout
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/btn_rep1"
+            android:id="@+id/btn_case1"
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
-            android:text="server->local (continuous)" />
+            android:text="1. Syncro" />
         <Button
+            android:id="@+id/btn_case2"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="2. Edit" />
+        <Button
+            android:id="@+id/btn_case3"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="3. Update" />
+<!--        <Button
             android:id="@+id/btn_rep2"
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
-            android:text="local->server" />
+            android:text="local->server" />-->
     </LinearLayout>
     
     <TextView
