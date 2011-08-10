@@ -86,26 +86,8 @@ public class Main extends Activity {
                 startActivity(intent);
             }
         });
-        // findViewById(R.id.btn_contacts).setOnClickListener(new
-        // OnClickListener() {
-        // @Override
-        // public void onClick(View v) {
-        // TextView tv = (TextView) findViewById(R.id.output);
-        // tv.setText("");
-        // // Query RAW contact data
-        // Cursor c = getContentResolver().query(Data.CONTENT_URI,
-        // new String[] { Data._ID, Data.CONTACT_ID, Data.MIMETYPE, Data.DATA1
-        // },
-        // null, null, null);
-        // // Show to output
-        // while (c.moveToNext()) {
-        // tv.append(c.getString(c.getColumnIndex(Data.CONTACT_ID)) + ": "
-        // + c.getString(c.getColumnIndex(Data.MIMETYPE)) + ", "
-        // + c.getString(c.getColumnIndex(Data.DATA1)) + "\n");
-        // }
-        // }
-        // });
-        findViewById(R.id.btn_rep1).setOnClickListener(new OnClickListener() {
+        // Use Case 1
+        findViewById(R.id.btn_case1).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Server -> Local
@@ -115,19 +97,6 @@ public class Main extends Activity {
                         + "\",\"create_target\":true,\"continuous\":true}", null).execute();
             }
         });
-        // findViewById(R.id.btn_rep2).setOnClickListener(new OnClickListener()
-        // {
-        // @Override
-        // public void onClick(View v) {
-        // // Local -> Server
-        // new LocalRequestTask(mHost, mPort, "POST", "_replicate",
-        // "{\"source\":\"" + DBNAME
-        // + "\",\"target\":\""
-        // + getString(R.string.server_master, ADMIN_USR, ADMIN_PWD, DBNAME) +
-        // "\"}",
-        // null).execute();
-        // }
-        // });
     }
 
     @Override
