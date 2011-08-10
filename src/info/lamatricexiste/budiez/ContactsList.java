@@ -18,11 +18,13 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.SimpleAdapter;
 
 public class ContactsList extends ListActivity {
 
+    private final static String TAG = "ContactsList";
     private final static String ACTION_LIST = "contacts/_design/read/_view/titles";
     private final static String NAME = "title";
     private final static String ID = "id";
@@ -40,10 +42,14 @@ public class ContactsList extends ListActivity {
         String action = intent.getAction();
         if (Constants.ACTION_LOCAL_LIST.equals(action)) {
             Bundle data = intent.getExtras();
-            // Server -> Local
-            String host = data.getString(Constants.DATA_HOST);
-            int port = data.getInt(Constants.DATA_PORT);
-            new LocalRequestTask(host, port, "GET", ACTION_LIST, "", null).execute();
+            if (data != null) {
+                // Server -> Local
+                String host = data.getString(Constants.DATA_HOST);
+                int port = data.getInt(Constants.DATA_PORT);
+                new LocalRequestTask(host, port, "GET", ACTION_LIST, "", null).execute();
+            } else {
+                Log.e(TAG, "DATA IS NULL");
+            }
         } else {
             new RemoteRequestTask(ContactsList.this, "GET", ACTION_LIST, "", null).execute();
         }
